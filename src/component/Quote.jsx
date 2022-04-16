@@ -11,22 +11,15 @@ import {
 export const Quote = () => {
   const [order, setOrder] = useState("ASC");
   const [icon, setIcon] = useState(faArrowsAltV);
-  const { keyword, setKeyword, symbol, setSymbol } = useContext(ClickContext);
-  const [date, setDate] = useState();
-
-  // setDate(new Date());
-  // useEffect(() => {
-  //   let datevariable = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-  //   console.log(datevariable);
-  //   setDate(datevariable);
-  // }, []);
+  const { keyword, setKeyword, symbol } = useContext(ClickContext); // getting data from context
 
   useEffect(() => {
+    // Quotes API getting stock symbol from context
     fetch(`https://prototype.sbulltech.com/api/v2/quotes/${symbol}`).then(
       (response) => {
         response.json().then((result) => {
-          console.log("result==>", result);
-          console.log(result.payload[symbol]);
+          // console.log("result", result);
+          // console.log(result.payload[symbol]);
           setKeyword(result.payload[symbol]);
         });
       }
@@ -34,12 +27,13 @@ export const Quote = () => {
   }, []);
 
   function sorting(col) {
+    // Sorting and storing it in context
     if (order === "ASC") {
       const sorted = [...keyword].sort((a, b) =>
         a[col].toLowerCase() > b[col].toLowerCase() ? 1 : -1
       );
       setKeyword(sorted);
-      setOrder("DSC");
+      setOrder("DSC"); // Using the asyncronous behaviour of useState
       setIcon(faSortUp);
     }
     if (order === "DSC") {
@@ -47,7 +41,7 @@ export const Quote = () => {
         a[col].toLowerCase() < b[col].toLowerCase() ? 1 : -1
       );
       setKeyword(sorted);
-      setOrder("ASC");
+      setOrder("ASC"); // Using the asyncronous behaviour of useState
       setIcon(faSortDown);
     }
   }
@@ -61,19 +55,25 @@ export const Quote = () => {
             <tr>
               <th>Price</th>
               <th onClick={() => sorting("time")}>
-                Time <FontAwesomeIcon icon={icon} color="red" />
+                Time (Asc/Des) <nbsp />
+                <FontAwesomeIcon icon={icon} color="red" />
               </th>
               <th>Validtill</th>
             </tr>
           </thead>
           <tbody>
-            {keyword.map((val, key) => (
-              <tr>
-                <td>{val.price}</td>
-                <td>{val.time}</td>
-                <td>{val.valid_till}</td>
-              </tr>
-            ))}
+            {keyword.map(
+              (
+                val,
+                key // mapping the quotes data
+              ) => (
+                <tr>
+                  <td>{val.price}</td>
+                  <td>{val.time}</td>
+                  <td>{val.valid_till}</td>
+                </tr>
+              )
+            )}
           </tbody>
         </table>
       </div>

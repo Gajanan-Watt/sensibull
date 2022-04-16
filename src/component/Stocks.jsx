@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./stocks.css";
-import { Form } from "react-bootstrap";
+
 import { csv } from "d3";
 import { useNavigate } from "react-router-dom";
 import { ClickContext } from "../context/ClickContext";
+import { Input, InputAdornment } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 export const Stocks = () => {
   const [list, setList] = useState([]);
@@ -13,6 +15,7 @@ export const Stocks = () => {
   const { setSymbol } = useContext(ClickContext);
 
   useEffect(() => {
+    // getting instruments data from api
     csv("https://prototype.sbulltech.com/api/v2/instruments").then((data) => {
       setList(data);
       console.log(data);
@@ -21,6 +24,7 @@ export const Stocks = () => {
 
   var navigate = useNavigate();
   function clickMe(item) {
+    // Storing the stock symbol in context and navigating to quotes page
     console.log(item.Symbol);
     setSymbol(item.Symbol);
 
@@ -32,12 +36,18 @@ export const Stocks = () => {
       <div className="stock_page">
         <h3>STOCK-PAGE</h3>
         <div className="search_box">
-          <Form.Control
-            type="text"
-            placeholder="Search Stock..."
-            onChange={(event) => setSearchTitle(event.target.value)}
+          <Input
+            id="input-with-icon-adornment"
+            placeholder="Search"
+            onChange={(event) => setSearchTitle(event.target.value)} // storing the title typed for filtering
+            startAdornment={
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            }
           />
         </div>
+        <br />
         <div className="stock_table">
           <table id="customers">
             <thead>
@@ -51,6 +61,7 @@ export const Stocks = () => {
             <tbody>
               {list
                 .filter((value) => {
+                  // filter according to title
                   if (searchTitle === "") {
                     return value;
                   } else if (
@@ -60,6 +71,7 @@ export const Stocks = () => {
                   }
                 })
                 .map((item, i) => (
+                  // mapping the filtered data
                   <tr>
                     <td>
                       <h3 onClick={() => clickMe(item)}>{item.Symbol}</h3>
